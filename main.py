@@ -3,8 +3,22 @@ import time
 import serial
 import serial.tools.list_ports
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:8001"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # ------------------------------------------------------------------
 # 1) FUNCIÓN PARA TRANSFORMAR LA TRAMA (sin cambios)
@@ -36,7 +50,7 @@ class BalanzaApp:
         # CONFIGURACIÓN SERIAL
         # ---------------------------
         self.oComm = serial.Serial()
-        self.oComm.port = "COM4"  # Conexión fija al COM4
+        self.oComm.port = "COM3"  # Conexión fija al COM4
         self.oComm.baudrate = 9600
         self.oComm.parity = serial.PARITY_NONE
         self.oComm.bytesize = serial.EIGHTBITS
@@ -174,7 +188,7 @@ balanza = BalanzaApp()
 # 4) ENDPOINTS EN FASTAPI
 # ------------------------------------------------------------------
 
-@app.get("/")
+@app.get("/weight")
 def home():
     """
     Endpoint simple que devuelve el estado actual:
@@ -182,10 +196,13 @@ def home():
     - Última trama recibida (txtTrama)
     - Si está activo el 'timer' (timer_active)
     """
+    fecha_and_time = time.strftime("%Y-%m-%d %H:%M:%S")
+    
     return {
         "peso": balanza.txtPeso,
         "trama": balanza.txtTrama,
-        "timer_active": balanza.timer_active
+        "timer_active": balanza.timer_active,
+        'fecha_and_time': fecha_and_time
     }
 
 
