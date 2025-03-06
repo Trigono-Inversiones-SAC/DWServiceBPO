@@ -3,8 +3,27 @@ import time
 import serial
 import serial.tools.list_ports
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+    "http://localhost:5173",
+    "https://inventarios-dev.bluepacificoils.com",
+    "https://inventarios.bluepacificoils.com"
+]
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 
 # ------------------------------------------------------------------
 # 1) FUNCIÓN PARA TRANSFORMAR LA TRAMA (sin cambios)
@@ -174,7 +193,7 @@ balanza = BalanzaApp()
 # 4) ENDPOINTS EN FASTAPI
 # ------------------------------------------------------------------
 
-@app.get("/")
+@app.get("/weight/")
 def home():
     """
     Endpoint simple que devuelve el estado actual:
@@ -182,10 +201,13 @@ def home():
     - Última trama recibida (txtTrama)
     - Si está activo el 'timer' (timer_active)
     """
+    fecha_y_hora = time.strftime("%Y-%m-%d %H:%M:%S")
+    
     return {
         "peso": balanza.txtPeso,
         "trama": balanza.txtTrama,
-        "timer_active": balanza.timer_active
+        "timer_active": balanza.timer_active,
+        'fecha_and_time': fecha_y_hora
     }
 
 
