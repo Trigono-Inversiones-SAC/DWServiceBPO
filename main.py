@@ -55,7 +55,7 @@ class BalanzaApp:
         # CONFIGURACIÓN SERIAL
         # ---------------------------
         self.oComm = serial.Serial()
-        self.oComm.port = "COM4"  # Conexión fija al COM4
+        self.oComm.port = "COM3"  # Conexión fija al COM4
         self.oComm.baudrate = 9600
         self.oComm.parity = serial.PARITY_NONE
         self.oComm.bytesize = serial.EIGHTBITS
